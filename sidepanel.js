@@ -5,6 +5,7 @@ class WaferApp {
     this.isModelAvailable = false;
     this.isDownloading = false;
     this.currentText = '';
+    this.currentMode = 'rewrite'; // 'rewrite' or 'write'
     this.history = [];
     this.currentHistoryIndex = -1;
     this.customTones = [];
@@ -20,13 +21,18 @@ class WaferApp {
   }
 
   setupEventListeners() {
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => this.handleTabClick(e));
+    });
+
     // Option buttons
     document.querySelectorAll('.option-btn').forEach(btn => {
       btn.addEventListener('click', (e) => this.handleOptionClick(e));
     });
 
     // Main action buttons
-    document.getElementById('rewriteBtn').addEventListener('click', () => this.rewriteText());
+    document.getElementById('rewriteBtn').addEventListener('click', () => this.processText());
     document.getElementById('clearBtn').addEventListener('click', () => this.clearAll());
     document.getElementById('copyBtn').addEventListener('click', () => this.copyOutput());
     document.getElementById('regenerateBtn').addEventListener('click', () => this.regenerateText());
@@ -47,6 +53,12 @@ class WaferApp {
     // Input text change
     document.getElementById('inputText').addEventListener('input', (e) => {
       this.currentText = e.target.value;
+      this.updateTabTitles();
+    });
+
+    // Write instructions change
+    document.getElementById('writeInstructions').addEventListener('input', (e) => {
+      this.updateTabTitles();
     });
 
     // Listen for sidepanel closing to clear everything
@@ -183,6 +195,64 @@ class WaferApp {
     const inputText = document.getElementById('inputText');
     inputText.value = text;
     this.currentText = text;
+    this.updateTabTitles();
+  }
+
+  handleTabClick(e) {
+    const clickedTab = e.target.closest('.tab-btn');
+    const tabType = clickedTab.dataset.tab;
+    
+    // Update active tab
+    document.querySelectorAll('.tab-btn').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    clickedTab.classList.add('active');
+    
+    // Update active panel
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      panel.classList.remove('active');
+    });
+    document.getElementById(`${tabType}Panel`).classList.add('active');
+    
+    // Update current mode
+    this.currentMode = tabType;
+    this.updateUI();
+  }
+
+  updateTabTitles() {
+    const rewriteTab = document.getElementById('rewriteTab');
+    const writeTab = document.getElementById('writeTab');
+    const inputText = document.getElementById('inputText').value.trim();
+    
+    if (inputText && this.currentMode === 'write') {
+      // If there's text to rewrite and we're in write mode, show custom instructions option
+      rewriteTab.querySelector('.tab-title').textContent = 'Custom Instructions';
+    } else {
+      rewriteTab.querySelector('.tab-title').textContent = 'Text to Rewrite';
+    }
+    
+    writeTab.querySelector('.tab-title').textContent = 'Write from Scratch';
+  }
+
+  updateUI() {
+    const rewriteBtn = document.getElementById('rewriteBtn');
+    const btnText = rewriteBtn.querySelector('.btn-text');
+    const outputHeader = document.querySelector('.output-section .section-label');
+    const outputPlaceholder = document.querySelector('.output-placeholder');
+    
+    if (this.currentMode === 'write') {
+      btnText.textContent = 'Generate Text';
+      outputHeader.textContent = 'Generated Text';
+      if (outputPlaceholder) {
+        outputPlaceholder.textContent = 'Your generated text will appear here...';
+      }
+    } else {
+      btnText.textContent = 'Rewrite Text';
+      outputHeader.textContent = 'Rewritten Text';
+      if (outputPlaceholder) {
+        outputPlaceholder.textContent = 'Your rewritten text will appear here...';
+      }
+    }
   }
 
   handleOptionClick(e) {
@@ -207,8 +277,19 @@ class WaferApp {
     return { tone, length, format, customPrompt };
   }
 
-  buildPrompt(text, options) {
-    let prompt = `Please rewrite the following text with these specifications:\n\n`;
+  buildPrompt(text, options, mode = 'rewrite') {
+    let prompt;
+    
+    if (mode === 'write') {
+      // Write from scratch mode
+      prompt = `Please write text based on the following instructions and requirements:\n\n`;
+      
+      // Add the instructions/topic
+      prompt += `Topic/Instructions: ${text}\n\n`;
+    } else {
+      // Rewrite mode
+      prompt = `Please rewrite the following text with these specifications:\n\n`;
+    }
     
     // Check if it's a custom tone
     const customTone = this.customTones.find(tone => tone.id === options.tone);
@@ -227,11 +308,11 @@ class WaferApp {
       prompt += `Tone: ${toneInstructions[options.tone] || toneInstructions.professional}\n`;
     }
     
-    // Add length instruction
+    // Add length instruction (modify for write mode)
     const lengthInstructions = {
-      shorter: 'Make it more concise and shorter',
-      same: 'Keep approximately the same length',
-      longer: 'Expand it with more detail and explanation'
+      shorter: mode === 'write' ? 'Keep it concise and brief' : 'Make it more concise and shorter',
+      same: mode === 'write' ? 'Write a moderate length response' : 'Keep approximately the same length',
+      longer: mode === 'write' ? 'Write a detailed and comprehensive response' : 'Expand it with more detail and explanation'
     };
     
     prompt += `Length: ${lengthInstructions[options.length] || lengthInstructions.same}\n`;
@@ -248,20 +329,34 @@ class WaferApp {
       prompt += `Additional instructions: ${options.customPrompt}\n`;
     }
     
-    prompt += `\nText to rewrite:\n"${text}"\n\nRewritten text:`;
+    if (mode === 'rewrite') {
+      prompt += `\nText to rewrite:\n"${text}"\n\nRewritten text:`;
+    } else {
+      prompt += `\nGenerated text:`;
+    }
     
     return prompt;
   }
 
-  async rewriteText() {
+  async processText() {
     if (!this.isModelAvailable || this.isDownloading) {
       alert('Model is not ready yet. Please wait for it to download.');
       return;
     }
 
-    const inputText = document.getElementById('inputText').value.trim();
+    let inputText;
+    let alertMessage;
+    
+    if (this.currentMode === 'write') {
+      inputText = document.getElementById('writeInstructions').value.trim();
+      alertMessage = 'Please enter instructions for what you want to write.';
+    } else {
+      inputText = document.getElementById('inputText').value.trim();
+      alertMessage = 'Please enter some text to rewrite.';
+    }
+
     if (!inputText) {
-      alert('Please enter some text to rewrite.');
+      alert(alertMessage);
       return;
     }
 
@@ -272,7 +367,8 @@ class WaferApp {
 
     // Show loading state
     rewriteBtn.disabled = true;
-    btnText.textContent = 'Rewriting...';
+    const loadingText = this.currentMode === 'write' ? 'Generating...' : 'Rewriting...';
+    btnText.textContent = loadingText;
     btnSpinner.classList.remove('hidden');
     outputContent.classList.add('streaming');
     outputContent.textContent = '';
@@ -287,7 +383,7 @@ class WaferApp {
       }
 
       const options = this.getSelectedOptions();
-      const prompt = this.buildPrompt(inputText, options);
+      const prompt = this.buildPrompt(inputText, options, this.currentMode);
 
       // Stream the response
       const stream = this.session.promptStreaming(prompt);
@@ -304,6 +400,7 @@ class WaferApp {
         input: inputText,
         output: fullResponse,
         options: options,
+        mode: this.currentMode,
         prompt: prompt,
         timestamp: new Date().toISOString()
       });
@@ -311,12 +408,13 @@ class WaferApp {
       this.showHistory();
 
     } catch (error) {
-      console.error('Error rewriting text:', error);
-      outputContent.textContent = 'Error: Failed to rewrite text. Please try again.';
+      console.error('Error processing text:', error);
+      const errorMessage = this.currentMode === 'write' ? 'Error: Failed to generate text. Please try again.' : 'Error: Failed to rewrite text. Please try again.';
+      outputContent.textContent = errorMessage;
     } finally {
       // Reset button state
       rewriteBtn.disabled = false;
-      btnText.textContent = 'Rewrite Text';
+      this.updateUI(); // This will set the correct button text
       btnSpinner.classList.add('hidden');
       outputContent.classList.remove('streaming');
     }
@@ -327,13 +425,35 @@ class WaferApp {
     
     const lastEntry = this.history[this.history.length - 1];
     
-    // Set the input and options from last entry
-    document.getElementById('inputText').value = lastEntry.input;
+    // Switch to the correct mode and set the input
+    if (lastEntry.mode) {
+      this.currentMode = lastEntry.mode;
+      
+      // Update tab UI
+      document.querySelectorAll('.tab-btn').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === this.currentMode);
+      });
+      
+      // Update panel UI
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === `${this.currentMode}Panel`);
+      });
+      
+      this.updateUI();
+    }
+    
+    // Set the input in the correct field
+    if (this.currentMode === 'write') {
+      document.getElementById('writeInstructions').value = lastEntry.input;
+    } else {
+      document.getElementById('inputText').value = lastEntry.input;
+    }
+    
     this.setSelectedOptions(lastEntry.options);
     document.getElementById('customPrompt').value = lastEntry.options.customPrompt || '';
     
     // Regenerate
-    await this.rewriteText();
+    await this.processText();
   }
 
   setSelectedOptions(options) {
@@ -433,6 +553,7 @@ class WaferApp {
 
   clearAll() {
     document.getElementById('inputText').value = '';
+    document.getElementById('writeInstructions').value = '';
     document.getElementById('customPrompt').value = '';
     document.getElementById('outputContent').innerHTML = '<div class="output-placeholder">Your rewritten text will appear here...</div>';
     document.getElementById('historySection').classList.add('hidden');
@@ -440,6 +561,8 @@ class WaferApp {
     this.history = [];
     this.currentHistoryIndex = -1;
     this.saveHistory();
+    this.updateTabTitles();
+    this.updateUI();
   }
 
   openSettings() {

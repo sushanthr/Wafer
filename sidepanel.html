@@ -35,15 +35,38 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Text Input Area -->
+            <!-- Text Input Area with Tabs -->
             <div class="input-section">
-                <label for="inputText" class="section-label">Text to Rewrite</label>
-                <textarea 
-                    id="inputText" 
-                    class="text-input" 
-                    placeholder="Select text on any webpage and right-click to use Wafer, or paste your text here..."
-                    rows="6"
-                ></textarea>
+                <div class="input-tabs">
+                    <button class="tab-btn active" id="rewriteTab" data-tab="rewrite">
+                        <span class="tab-title">Text to Rewrite</span>
+                    </button>
+                    <button class="tab-btn" id="writeTab" data-tab="write">
+                        <span class="tab-title">Write from Scratch</span>
+                    </button>
+                </div>
+                
+                <div class="tab-content">
+                    <!-- Rewrite Tab Content -->
+                    <div class="tab-panel active" id="rewritePanel">
+                        <textarea 
+                            id="inputText" 
+                            class="text-input" 
+                            placeholder="Select text on any webpage and right-click to use Wafer, or paste your text here..."
+                            rows="6"
+                        ></textarea>
+                    </div>
+                    
+                    <!-- Write from Scratch Tab Content -->
+                    <div class="tab-panel" id="writePanel">
+                        <textarea 
+                            id="writeInstructions" 
+                            class="text-input" 
+                            placeholder="Describe what you want to write about. Include key points, tone, style, and any specific requirements..."
+                            rows="6"
+                        ></textarea>
+                    </div>
+                </div>
             </div>
 
             <!-- Rewrite Options -->
