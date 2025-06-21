@@ -48,6 +48,18 @@ class WaferApp {
     document.getElementById('inputText').addEventListener('input', (e) => {
       this.currentText = e.target.value;
     });
+
+    // Listen for sidepanel closing to clear everything
+    window.addEventListener('beforeunload', () => {
+      this.clearAll();
+    });
+
+    // Also listen for visibility change as backup
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.clearAll();
+      }
+    });
   }
 
   setupMessageListener() {
@@ -285,7 +297,8 @@ class WaferApp {
         fullResponse += chunk;
         outputContent.textContent = fullResponse;
       }
-
+      this.session = null;
+      
       // Save to history
       this.addToHistory({
         input: inputText,

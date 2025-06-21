@@ -80,6 +80,7 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: large;
 }
 
 .settings-btn:hover {
@@ -605,7 +606,7 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 400px) {
+@media (max-width: 300px) {
   .main-content {
     padding: 16px;
   }
