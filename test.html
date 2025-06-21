@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wafer Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-text {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #6366f1;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        h1 { color: #6366f1; }
+        h2 { color: #333; }
+        .highlight { background: yellow; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Wafer Extension Test Page</h1>
+    
+    <div class="instructions">
+        <h3>How to Test:</h3>
+        <ol>
+            <li>Make sure the Wafer extension is installed and enabled</li>
+            <li>Select any text in the sections below</li>
+            <li>Right-click and choose "Rewrite with Wafer"</li>
+            <li>The side panel should open with your selected text</li>
+            <li>Try different tones, lengths, and formats</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>📧 Email Text</h2>
+        <div class="test-text">
+            Hi John, I hope you're doing well. I wanted to reach out about the project we discussed last week. I think we should move forward with the implementation as soon as possible. Let me know what you think and if you have any questions. Thanks for your time and I look forward to hearing from you soon.
+        </div>
+        <p><strong>Try:</strong> Rewrite this as more formal, casual, or professional</p>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Technical Documentation</h2>
+        <div class="test-text">
+            The API endpoint accepts POST requests with JSON payload containing user credentials. Authentication is performed using JWT tokens which expire after 24 hours. Rate limiting is implemented at 100 requests per minute per IP address. Error responses include appropriate HTTP status codes and descriptive error messages.
+        </div>
+        <p><strong>Try:</strong> Simplify for beginners or make it more detailed</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Marketing Copy</h2>
+        <div class="test-text">
+            Our new product revolutionizes the way you work. With cutting-edge technology and user-friendly design, it's the perfect solution for modern professionals. Experience increased productivity and seamless workflow integration like never before.
+        </div>
+        <p><strong>Try:</strong> Make it more creative, casual, or convert to markdown format</p>
+    </div>
+
+    <div class="test-section">
+        <h2>📚 Academic Text</h2>
+        <div class="test-text">
+            The research methodology employed in this study utilized a mixed-methods approach, incorporating both quantitative and qualitative data collection techniques. Participants were recruited through stratified random sampling, ensuring representative demographic distribution across the target population.
+        </div>
+        <p><strong>Try:</strong> Make it shorter or more accessible to general audience</p>
+    </div>
+
+    <div class="test-section">
+        <h2>💬 Social Media Post</h2>
+        <div class="test-text">
+            Just finished an amazing workout at the gym! Feeling energized and ready to tackle the rest of the day. Remember, consistency is key when it comes to fitness goals. What's your favorite way to stay active?
+        </div>
+        <p><strong>Try:</strong> Make it more professional or formal</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Instructions</h2>
+        <div class="test-text">
+            To install the software, first download the installer from our website. Run the executable file and follow the setup wizard. Make sure to restart your computer after installation is complete. The application will be available in your start menu.
+        </div>
+        <p><strong>Try:</strong> Convert to markdown format or make it more detailed</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🎨 Creative Writing</h2>
+        <div class="test-text">
+            The old lighthouse stood majestically on the rocky cliff, its beacon cutting through the thick fog that rolled in from the sea. Waves crashed against the jagged rocks below, sending spray high into the air where it caught the last rays of the setting sun.
+        </div>
+        <p><strong>Try:</strong> Make it more dramatic, casual, or shorter</p>
+    </div>
+
+    <script>
+        // Add some interactivity to highlight selected text
+        document.addEventListener('mouseup', function() {
+            const selection = window.getSelection();
+            if (selection.toString().length > 0) {
+                console.log('Selected text:', selection.toString());
+            }
+        });
+
+        // Add a visual indicator when text is selected
+        document.addEventListener('selectionchange', function() {
+            // Remove previous highlights
+            document.querySelectorAll('.highlight').forEach(el => {
+                el.classList.remove('highlight');
+            });
+            
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0 && selection.toString().trim()) {
+                try {
+                    const range = selection.getRangeAt(0);
+                    const span = document.createElement('span');
+                    span.className = 'highlight';
+                    range.surroundContents(span);
+                } catch (e) {
+                    // Ignore errors for complex selections
+                }
+            }
+        });
+    </script>
+</body>
+</html>
