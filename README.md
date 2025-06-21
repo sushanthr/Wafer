@@ -24,8 +24,7 @@ To use this extension, you need Chrome / Edge with the Prompt API enabled:
 
 1. Use Chrome / Edge Canary (version 127 or later)
 2. Enable the following flags in `Chrome://flags/`:
-   - `#prompt-api-for-gemini-nano` or '#edge-llm-prompt-api-for-phi-mini'
-   - `#optimization-guide-on-device-model`
+   - `#prompt-api-for-gemini-nano` or `#edge-llm-prompt-api-for-phi-mini`
 3. Restart Chrome / Edge
 4. The first time you use the extension, it may need to download the language model
 
