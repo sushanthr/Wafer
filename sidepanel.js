@@ -164,6 +164,9 @@ class WaferApp {
       this.updateStatus('unavailable', 'Failed to download model');
       downloadProgress.classList.add('hidden');
       this.isDownloading = false;
+      setTimeout(() => {
+        this.checkModelAvailability(); // Retry after a delay
+      }, 1000); 
     }
   }
 
