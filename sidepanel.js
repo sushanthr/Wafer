@@ -15,6 +15,7 @@ class WaferApp {
 
   async init() {
     this.setupEventListeners();
+    this.clearAll();
     this.loadSettings();
     await this.checkModelAvailability();
     this.setupMessageListener();
