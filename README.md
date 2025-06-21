@@ -1,4 +1,4 @@
-# Wafer - Writing Assistance For EveRyone
+# WAFER - Writing Assistance For EveRyone
 
 Wafer is a Chrome / Edge extension that provides AI-powered writing assistance using Chrome / Edge's built-in Prompt API. 
 It allows you to rewrite any selected text on web pages or write from scratch with different tones, lengths, and formats.
